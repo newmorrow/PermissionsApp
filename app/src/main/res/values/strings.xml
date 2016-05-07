@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">PermissionsApp</string>
+    <string name="read_contacts">Read Contacts</string>
+    <string name="write_contacts">Write Contacts</string>
+    <string name="launch_camera">Launch Camera</string>
+    <string name="launch_overlay">Launch Overlay</string>
+    <string name="title">Android Permissions Model</string>
+</resources>
