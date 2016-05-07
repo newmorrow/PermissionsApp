@@ -2,20 +2,28 @@ package com.example.veretennikova.permissionsapp;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.PermissionChecker;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AlertDialog;
+import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 
 public class MainActivity extends Activity {
@@ -31,6 +39,18 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        TextView targetSdkVersion = (TextView) findViewById(R.id.target_sdk);
+        int version = 0;
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            version = packageInfo.applicationInfo.targetSdkVersion;
+
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        targetSdkVersion.setText(getString(R.string.target_sdk, String.valueOf(version)));
+
         Button readContactsBtn = (Button) findViewById(R.id.read_contacts);
         readContactsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,7 +102,6 @@ public class MainActivity extends Activity {
                                 requestPermission(permission, readContactsRequestCode);
                             }
                         })
-                        .create()
                         .show();
             } else {
                 // No explanation needed, we can request the permission.
@@ -120,8 +139,36 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == OVERLAY_REQUEST_CODE) {
+            //check whether permission was granted
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!Settings.canDrawOverlays(this)) {
+                    // SYSTEM_ALERT_WINDOW permission not granted
+                } else {
+                    toggleOverlayService();
+                }
+            }
+        }
+    }
+
     private void showContacts() {
-        //todo
+        ContentResolver cr = getContentResolver();
+        Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI,
+                null, null, null, null
+        );
+        new AlertDialog.Builder(this)
+                .setAdapter(
+                        new SimpleCursorAdapter(
+                                this,
+                                android.R.layout.simple_list_item_1,
+                                cursor,
+                                new String[]{ContactsContract.Contacts.DISPLAY_NAME}, new int[]{android.R.id.text1}, 0
+                        ),
+                        null
+                )
+                .show();
     }
 
     private void launchCamera() {
@@ -143,7 +190,7 @@ public class MainActivity extends Activity {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + getPackageName()));
             //request the permission
-            startActivity(intent);
+            startActivityForResult(intent, OVERLAY_REQUEST_CODE);
             return;
         }
         toggleOverlayService();

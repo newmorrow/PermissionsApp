@@ -6,13 +6,12 @@
     android:gravity="center_horizontal"
     android:padding="@dimen/activity_horizontal_margin">
 
-
     <TextView
+        android:id="@+id/target_sdk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="12pt"
-        android:paddingBottom="@dimen/elements_gap"
-        android:text="@string/title" />
+        android:paddingBottom="@dimen/elements_gap" />
 
     <Button
         android:id="@+id/read_contacts"
