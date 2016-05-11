@@ -4,6 +4,8 @@
     <string name="write_contacts">Write Contacts</string>
     <string name="launch_camera">Launch Camera</string>
     <string name="launch_overlay">Launch Overlay</string>
+    <string name="on_permissions">Permissions Check ON</string>
+    <string name="off_permissions">Permissions Check OFF</string>
     <string name="title">Android Permissions Model</string>
     <string name="target_sdk">TargetSdkVersion %s</string>
 </resources>

@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -20,7 +19,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.PermissionChecker;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AlertDialog;
-import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -33,6 +31,9 @@ public class MainActivity extends Activity {
     private static final int CAMERA_REQUEST_CODE = 2;
     private static final int OVERLAY_REQUEST_CODE = 3;
     private static final int REQUEST_IMAGE_CAPTURE = 5;
+
+    private boolean shallCheck = true;
+    private Button permissionsButton;
 
     @SuppressWarnings("ConstantConditions")
     @Override
@@ -55,7 +56,7 @@ public class MainActivity extends Activity {
         readContactsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!requestPermissionIfNeeded(Manifest.permission.READ_CONTACTS, READ_CONTACTS_REQUEST_CODE)) {
+                if (shallCheck || !requestPermissionIfNeeded(Manifest.permission.READ_CONTACTS, READ_CONTACTS_REQUEST_CODE)) {
                     showContacts();
                 }
             }
@@ -64,7 +65,7 @@ public class MainActivity extends Activity {
         writeContactsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!requestPermissionIfNeeded(Manifest.permission.WRITE_CONTACTS, WRITE_CONTACTS_REQUEST_CODE)) {
+                if (shallCheck || !requestPermissionIfNeeded(Manifest.permission.WRITE_CONTACTS, WRITE_CONTACTS_REQUEST_CODE)) {
                     showContacts();
                 }
             }
@@ -73,7 +74,7 @@ public class MainActivity extends Activity {
         launchCameraBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!requestPermissionIfNeeded(Manifest.permission.CAMERA, CAMERA_REQUEST_CODE)) {
+                if (shallCheck || !requestPermissionIfNeeded(Manifest.permission.CAMERA, CAMERA_REQUEST_CODE)) {
                     launchCamera();
                 }
             }
@@ -85,6 +86,26 @@ public class MainActivity extends Activity {
                 requestManageOverlayPermission();
             }
         });
+
+        permissionsButton = (Button) findViewById(R.id.switch_permissions);
+        updatePermissionsButton();
+        permissionsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                shallCheck = !shallCheck;
+                updatePermissionsButton();
+            }
+        });
+    }
+
+    private void updatePermissionsButton() {
+        if (shallCheck) {
+            permissionsButton.setText(getString(R.string.on_permissions));
+            permissionsButton.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
+        } else {
+            permissionsButton.setText(getString(R.string.off_permissions));
+            permissionsButton.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+        }
     }
 
     private boolean requestPermissionIfNeeded(final String permission, final int readContactsRequestCode) {
@@ -183,15 +204,17 @@ public class MainActivity extends Activity {
     }
 
     public void requestManageOverlayPermission() {
-        // First check whether the permission is granted
-        // Only for API level 23
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-            //construct an intent
-            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + getPackageName()));
-            //request the permission
-            startActivityForResult(intent, OVERLAY_REQUEST_CODE);
-            return;
+        if (shallCheck) {
+            // First check whether the permission is granted
+            // Only for API level 23
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+                //construct an intent
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+                //request the permission
+                startActivityForResult(intent, OVERLAY_REQUEST_CODE);
+                return;
+            }
         }
         toggleOverlayService();
     }
