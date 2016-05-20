@@ -56,7 +56,7 @@ public class MainActivity extends Activity {
         readContactsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (shallCheck || !requestPermissionIfNeeded(Manifest.permission.READ_CONTACTS, READ_CONTACTS_REQUEST_CODE)) {
+                if (!shallCheck || !requestPermissionIfNeeded(Manifest.permission.READ_CONTACTS, READ_CONTACTS_REQUEST_CODE)) {
                     showContacts();
                 }
             }
@@ -65,7 +65,7 @@ public class MainActivity extends Activity {
         writeContactsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (shallCheck || !requestPermissionIfNeeded(Manifest.permission.WRITE_CONTACTS, WRITE_CONTACTS_REQUEST_CODE)) {
+                if (!shallCheck || !requestPermissionIfNeeded(Manifest.permission.WRITE_CONTACTS, WRITE_CONTACTS_REQUEST_CODE)) {
                     showContacts();
                 }
             }
@@ -74,7 +74,7 @@ public class MainActivity extends Activity {
         launchCameraBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (shallCheck || !requestPermissionIfNeeded(Manifest.permission.CAMERA, CAMERA_REQUEST_CODE)) {
+                if (!shallCheck || !requestPermissionIfNeeded(Manifest.permission.CAMERA, CAMERA_REQUEST_CODE)) {
                     launchCamera();
                 }
             }
